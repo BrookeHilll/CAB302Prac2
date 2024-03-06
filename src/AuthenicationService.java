@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.ArrayList;
 
 public class AuthenicationService implements IAuthenticationService {
     private ArrayList<User> users;
