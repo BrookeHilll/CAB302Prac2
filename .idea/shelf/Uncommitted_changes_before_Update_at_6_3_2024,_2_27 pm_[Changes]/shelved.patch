@@ -1,0 +1,350 @@
+Index: src/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class Main {\n    // Static list of users, acting as a database\n\n    // NAOMI SAYS HI\n    private static ArrayList<User> users = new ArrayList<>();\n\n    // Mock authentication service that always returns the first user when log in, and does nothing when sign up\n    private static IAuthenticationService authService = new IAuthenticationService() {\n        @Override\n        public User signUp(String username, String password) {\n            return null;\n        }\n\n        @Override\n        public User logIn(String username, String password) {\n            return users.get(0);\n        }\n    };\n    private static boolean isRunning = true;\n\n    /**\n     * The entry point of the application.\n     * @param args The command-line arguments.\n     */\n    public static void main(String[] args) {\n        users.add(new User(\"test\", \"test\"));\n        while (isRunning) {\n            showMenu();\n        }\n    }\n\n    /**\n     * Displays the main menu to the user.\n     */\n    public static void showMenu() {\n        System.out.println(\"Welcome to the To-Do List Application!\");\n        System.out.println(\"1. Log in\");\n        System.out.println(\"2. Sign up\");\n        System.out.println(\"3. Exit\");\n        System.out.print(\"Enter your choice: \");\n        // Ask for user choice\n        Scanner scanner = new Scanner(System.in);\n        int choice = scanner.nextInt();\n        handleMenu(choice);\n    }\n\n    /**\n     * Handles the user's choice, mapping the menu options to the corresponding methods.\n     * @param choice The user's choice.\n     */\n    public static void handleMenu(int choice) {\n        switch (choice) {\n            case 1:\n                onLogIn();\n                break;\n            case 2:\n                onSignUp();\n                break;\n            case 3:\n                onExit();\n                break;\n            default:\n                System.out.println(\"Invalid choice!\");\n                showMenu();\n        }\n    }\n\n    /**\n     * Handles the log-in process, and the post-login operations.\n     */\n    public static void onLogIn() {\n        System.out.print(\"Enter your username: \");\n        Scanner scanner = new Scanner(System.in);\n        String username = scanner.nextLine();\n        System.out.print(\"Enter your password: \");\n        String password = scanner.nextLine();\n        User user = authService.logIn(username, password);\n        System.out.println(\"Welcome, \" + user.getUsername() + \"!\");\n        // TODO Later: Add the to-do list operations\n    }\n\n    /**\n     * Handles the sign-up process.\n     */\n    public static void onSignUp() {\n        System.out.print(\"Enter your username: \");\n        Scanner scanner = new Scanner(System.in);\n        String username = scanner.nextLine();\n        System.out.print(\"Enter your password: \");\n        String password = scanner.nextLine();\n        User user = authService.signUp(username, password);\n        // TODO Later: Shows a message based on the result\n    }\n\n    /**\n     * Exits the application by setting the `isRunning` flag to false.\n     */\n    public static void onExit() {\n        isRunning = false;\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Main.java b/src/Main.java
+--- a/src/Main.java	(revision c3d7d3ffae4df1c82417d10b572e5d2addfe3763)
++++ b/src/Main.java	(date 1709698900092)
+@@ -1,3 +1,6 @@
++import java.util.ArrayList;
++import java.util.Scanner;
++
+ public class Main {
+     // Static list of users, acting as a database
+ 
+Index: src/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class User {\n    private String username;\n    private String password;\n\n    public User(String username, String password) {\n        this.username = username;\n        this.password = password;\n    }\n\n    /**\n     * Gets the username of the user.\n     */\n    public String getUsername() {\n        return username;\n    }\n\n    /**\n     * Gets the password of the user.\n     */\n    public String getPassword() {\n        return password;\n    }\n\n    /**\n     * Sets the username of the user.\n     * @param username The username to set.\n     */\n    public void setUsername(String username) {\n        this.username = username;\n    }\n\n    /**\n     * Sets the password of the user.\n     * @param password The password to set.\n     */\n    public void setPassword(String password) {\n        this.password = password;\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/User.java b/src/User.java
+--- a/src/User.java	(revision c3d7d3ffae4df1c82417d10b572e5d2addfe3763)
++++ b/src/User.java	(date 1709698900097)
+@@ -1,10 +1,23 @@
++import java.util.ArrayList;
++
+ public class User {
+     private String username;
+     private String password;
+ 
++    private ArrayList<ToDoItem> toDoItems;
++
+     public User(String username, String password) {
+         this.username = username;
+         this.password = password;
++        this.toDoItems = new ArrayList<>();
++    }
++
++    /**
++     * Gets the to-do items of the user.
++     * @return A reference to the list of to-do items, which can be modified from outside the class.
++     */
++    public ArrayList<ToDoItem> getToDoItems() {
++        return toDoItems;
+     }
+ 
+     /**
+Index: src/ToDoList.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/ToDoList.java b/src/ToDoList.java
+new file mode 100644
+--- /dev/null	(date 1709699219453)
++++ b/src/ToDoList.java	(date 1709699219453)
+@@ -0,0 +1,136 @@
++import java.util.Scanner;
++
++public class ToDoList {
++    private User user;
++    private boolean isRunning;
++
++    /**
++     * Initializes the to-do list with the specified user.
++     * @param user The user of the to-do list.
++     */
++    public ToDoList(User user) {
++        this.user = user;
++        this.isRunning = true;
++    }
++
++    /**
++     * Displays the main menu to the user.
++     */
++    private void showMenu() {
++        System.out.println("1. Show all items");
++        System.out.println("2. Add an item");
++        System.out.println("3. Mark an item as done");
++        System.out.println("4. Mark an item as undone");
++        System.out.println("5. Delete an item");
++        System.out.println("6. Exit");
++        System.out.print("Enter your choice: ");
++        Scanner scanner = new Scanner(System.in);
++        int choice = scanner.nextInt();
++        handleMenu(choice);
++    }
++
++    /**
++     * Loops the showMenu method based on the `isRunning` flag.
++     */
++    public void run() {
++        while (isRunning) {
++            showMenu();
++        }
++    }
++
++    /**
++     * Handles the user's choice, mapping the menu options to the corresponding methods.
++     * @param choice The user's choice.
++     */
++    public void handleMenu(int choice) {
++        switch (choice) {
++            case 1:
++                onShowAllItems();
++                break;
++            case 2:
++                onAddItem();
++                break;
++            case 3:
++                onMarkAsDone();
++                break;
++            case 4:
++                onMarkAsUndone();
++                break;
++            case 5:
++                onDeleteItem();
++                break;
++            case 6:
++                onExit();
++                break;
++            default:
++                System.out.println("Invalid choice!");
++                showMenu();
++        }
++    }
++
++    /**
++     * Displays all the items in the list.
++     */
++    public void onShowAllItems() {
++        for (int i = 0; i < user.getToDoItems().size(); i++) {
++            ToDoItem item = user.getToDoItems().get(i);
++            if (item.isDone()) {
++                System.out.println(i + ". [X] " + item.getDescription());
++            } else {
++                System.out.println(i + ". [ ] " + item.getDescription());
++            }
++        }
++    }
++
++    /**
++     * Requests the user for a new item description and adds it to the list.
++     */
++    public void onAddItem() {
++        System.out.print("Enter the description of the item: ");
++        Scanner scanner = new Scanner(System.in);
++        String description = scanner.nextLine();
++        ToDoItem item = new ToDoItem(description);
++        user.getToDoItems().add(item);
++    }
++
++    /**
++     * Requests the user for an item number and marks it as done.
++     */
++    public void onMarkAsDone() {
++        onShowAllItems();
++        System.out.print("Enter the number of the item to mark as done: ");
++        Scanner scanner = new Scanner(System.in);
++        int itemNumber = scanner.nextInt();
++        user.getToDoItems().get(itemNumber).setDone(true);
++    }
++
++    /**
++     * Requests the user for an item number and marks it as undone.
++     */
++    public void onMarkAsUndone() {
++        onShowAllItems();
++        System.out.print("Enter the number of the item to mark as undone: ");
++        Scanner scanner = new Scanner(System.in);
++        int itemNumber = scanner.nextInt();
++        user.getToDoItems().get(itemNumber).setDone(false);
++    }
++
++    /**
++     * Requests the user for an item number and deletes it from the list.
++     */
++    public void onDeleteItem() {
++        onShowAllItems();
++        System.out.print("Enter the number of the item to delete: ");
++        Scanner scanner = new Scanner(System.in);
++        int itemNumber = scanner.nextInt();
++        user.getToDoItems().remove(itemNumber);
++        // TODO Now: Remove the item at the specified index from the user's to-do items list
++    }
++
++    /**
++     * Exits the application, which sets the `isRunning` flag to false.
++     */
++    public void onExit() {
++        isRunning = false;
++    }
++}
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"9d1299db-6c31-4bea-a6e2-c7d15b6fbe70\" name=\"Changes\" comment=\"Naomi edits\">\n      <change afterPath=\"$PROJECT_DIR$/src/IAuthenticationService.java\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/User.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Class\" />\n        <option value=\"Interface\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 1\n}</component>\n  <component name=\"ProjectId\" id=\"2dIUGfqtW4r8KfvnlZjimiMfvam\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;git-widget-placeholder&quot;: &quot;master&quot;,\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\n    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/n11033436/OneDrive - Queensland University of Technology/Year 4 Sem 1/CAB302 - Software Development/Week 2/Tutorial/Prac2/src/Main.java&quot;\n  }\n}</component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"9d1299db-6c31-4bea-a6e2-c7d15b6fbe70\" name=\"Changes\" comment=\"\" />\n      <created>1709694995865</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1709694995865</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"Naomi edits\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1709696241769</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1709696241769</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"2\" />\n    <servers />\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"Naomi edits\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Naomi edits\" />\n  </component>\n  <component name=\"XDebuggerManager\">\n    <breakpoint-manager>\n      <breakpoints>\n        <line-breakpoint enabled=\"true\" type=\"java-method\">\n          <url>file://$PROJECT_DIR$/src/Main.java</url>\n          <line>34</line>\n          <properties class=\"Main\" method=\"showMenu\">\n            <option name=\"EMULATED\" value=\"true\" />\n            <option name=\"WATCH_EXIT\" value=\"false\" />\n          </properties>\n          <option name=\"timeStamp\" value=\"2\" />\n        </line-breakpoint>\n      </breakpoints>\n    </breakpoint-manager>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision c3d7d3ffae4df1c82417d10b572e5d2addfe3763)
++++ b/.idea/workspace.xml	(date 1709698900124)
+@@ -4,10 +4,12 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="9d1299db-6c31-4bea-a6e2-c7d15b6fbe70" name="Changes" comment="Naomi edits">
+-      <change afterPath="$PROJECT_DIR$/src/IAuthenticationService.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/User.java" afterDir="false" />
++    <list default="true" id="9d1299db-6c31-4bea-a6e2-c7d15b6fbe70" name="Changes" comment="Adding extra files">
++      <change afterPath="$PROJECT_DIR$/src/ToDoItem.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/ToDoList.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/User.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -17,12 +19,17 @@
+   <component name="FileTemplateManagerImpl">
+     <option name="RECENT_TEMPLATES">
+       <list>
+-        <option value="Class" />
+         <option value="Interface" />
++        <option value="Class" />
+       </list>
+     </option>
+   </component>
+   <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="master" />
++      </map>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+   <component name="ProjectColorInfo">{
+@@ -34,15 +41,15 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+-    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/n11033436/OneDrive - Queensland University of Technology/Year 4 Sem 1/CAB302 - Software Development/Week 2/Tutorial/Prac2/src/Main.java&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "RunOnceActivity.OpenProjectViewOnStart": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "git-widget-placeholder": "list-operations",
++    "kotlin-language-version-configured": "true",
++    "onboarding.tips.debug.path": "C:/Users/n11033436/OneDrive - Queensland University of Technology/Year 4 Sem 1/CAB302 - Software Development/Week 2/Tutorial/Prac2/src/Main.java"
+   }
+-}</component>
++}]]></component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">
+     <task active="true" id="Default" summary="Default task">
+@@ -60,19 +67,39 @@
+       <option name="project" value="LOCAL" />
+       <updated>1709696241769</updated>
+     </task>
+-    <option name="localTasksCounter" value="2" />
++    <task id="LOCAL-00002" summary="Adding extra files">
++      <option name="closed" value="true" />
++      <created>1709696754785</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1709696754785</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
+     <servers />
++  </component>
++  <component name="Vcs.Log.Tabs.Properties">
++    <option name="TAB_STATES">
++      <map>
++        <entry key="MAIN">
++          <value>
++            <State />
++          </value>
++        </entry>
++      </map>
++    </option>
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="Naomi edits" />
+-    <option name="LAST_COMMIT_MESSAGE" value="Naomi edits" />
++    <MESSAGE value="Adding extra files" />
++    <option name="LAST_COMMIT_MESSAGE" value="Adding extra files" />
+   </component>
+   <component name="XDebuggerManager">
+     <breakpoint-manager>
+       <breakpoints>
+         <line-breakpoint enabled="true" type="java-method">
+           <url>file://$PROJECT_DIR$/src/Main.java</url>
+-          <line>34</line>
++          <line>37</line>
+           <properties class="Main" method="showMenu">
+             <option name="EMULATED" value="true" />
+             <option name="WATCH_EXIT" value="false" />
+Index: src/ToDoItem.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/ToDoItem.java b/src/ToDoItem.java
+new file mode 100644
+--- /dev/null	(date 1709697623278)
++++ b/src/ToDoItem.java	(date 1709697623278)
+@@ -0,0 +1,29 @@
++public class ToDoItem {
++    private String description;
++    private boolean isDone;
++
++    public ToDoItem(String description) {
++        this.description = description;
++        this.isDone = false;
++    }
++
++    // Getter for description
++    public String getDescription() {
++        return description;
++    }
++
++    // Setter for description
++    public void setDescription(String description) {
++        this.description = description;
++    }
++
++    // Getter for isDone
++    public boolean isDone() {
++        return isDone;
++    }
++
++    // Setter for isDone
++    public void setDone(boolean done) {
++        isDone = done;
++    }
++}
+\ No newline at end of file
