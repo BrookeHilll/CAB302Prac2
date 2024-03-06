@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Scanner;
 
 public class Main {
     // Static list of users, acting as a database
@@ -111,5 +112,3 @@ public class Main {
         isRunning = false;
     }
 }
-
-//brooke is broke
