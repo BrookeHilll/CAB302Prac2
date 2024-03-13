@@ -8,6 +8,7 @@ public class AuthenticationService implements IAuthenticationService{
 
     // TODO Now: Add a constructor to initialize the users list with the default user
     public AuthenticationService() {
+        users = new ArrayList<User>();
         users.add(new User("test", "test"));
     }
 
