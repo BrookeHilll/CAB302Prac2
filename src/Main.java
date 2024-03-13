@@ -21,7 +21,7 @@ public class Main {
 //        }
 //    };
 
-    private static IAuthenticationService authService = new AuthenicationService();
+    private static IAuthenticationService authService = new AuthenticationService();
     private static boolean isRunning = true;
 
     /**
